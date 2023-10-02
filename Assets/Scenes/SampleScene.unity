@@ -692,6 +692,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3bf4c2ca25a857f17968503a69fc1146, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  leafTexture: {fileID: 2800000, guid: 6a341baba6ae32557a75b170486aab80, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
