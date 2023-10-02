@@ -103,23 +103,23 @@ public class Leaf : MonoBehaviour
 
         //// create a rope:
 
-        // create the blueprint: (ltObiRopeBlueprint, ObiRodBlueprint)
-        var ropeBlueprint = ScriptableObject.CreateInstance<ObiRodBlueprint>();
-
-        // Procedurally generate the rope path (a simple straight line):
-        int filter = ObiUtils.MakeFilter(ObiUtils.CollideWithEverything, 0);
-        ropeBlueprint.path.Clear();
-        System.Action<Vector3, string> addControlPoint = (position, name) =>
-        {
-            ropeBlueprint.path.AddControlPoint(position, -Vector3.right, Vector3.right, Vector3.up, 0.1f, 0.1f, 1,
-                filter, Color.white, name);
-        };
-
-        addControlPoint(vertices[0], "start");
-        addControlPoint(vertices[xResolution], "end");
-
-        // generate the particle representation of the rope (wait until it has finished):
-        ropeBlueprint.GenerateImmediate();
+        // // create the blueprint: (ltObiRopeBlueprint, ObiRodBlueprint)
+        // var ropeBlueprint = ScriptableObject.CreateInstance<ObiRodBlueprint>();
+        //
+        // // Procedurally generate the rope path (a simple straight line):
+        // int filter = ObiUtils.MakeFilter(ObiUtils.CollideWithEverything, 0);
+        // ropeBlueprint.path.Clear();
+        // System.Action<Vector3, string> addControlPoint = (position, name) =>
+        // {
+        //     ropeBlueprint.path.AddControlPoint(position, -Vector3.right, Vector3.right, Vector3.up, 0.1f, 0.1f, 1,
+        //         filter, Color.white, name);
+        // };
+        //
+        // addControlPoint(vertices[0], "start");
+        // addControlPoint(vertices[xResolution], "end");
+        //
+        // // generate the particle representation of the rope (wait until it has finished):
+        // ropeBlueprint.GenerateImmediate();
 
 
         // create bones:
