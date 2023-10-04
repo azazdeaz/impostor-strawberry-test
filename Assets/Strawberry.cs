@@ -253,6 +253,12 @@ public class Strawberry : MonoBehaviour
             
             stitcher.PushDataToSolver();
         }
+        
+        var solver = GetComponentInParent<ObiSolver>();
+        for (var i = 0; i < solver.filters.count; i++)
+        {
+            solver.filters[i] = ObiUtils.CollideWithNothing;
+        }
     }
 
     // Update is called once per frame
