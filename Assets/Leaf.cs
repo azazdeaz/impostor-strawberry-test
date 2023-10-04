@@ -18,9 +18,9 @@ public static class RangeHelper
     }
 }
 
-[RequireComponent(typeof(MeshFilter), typeof(MeshRenderer))]
-[RequireComponent(typeof(ObiCloth), typeof(ObiClothRenderer))]
-[RequireComponent(typeof(ObiStitcher))]
+// [RequireComponent(typeof(MeshFilter), typeof(MeshRenderer))]
+// [RequireComponent(typeof(ObiCloth), typeof(ObiClothRenderer))]
+// [RequireComponent(typeof(ObiStitcher))]
 public class Leaf : MonoBehaviour
 {
     public int xResolution = 10;
@@ -71,8 +71,18 @@ public class Leaf : MonoBehaviour
         mesh.triangles = triangles;
         mesh.uv = uv;
         mesh.RecalculateNormals();
-
-        GetComponent<MeshFilter>().mesh = mesh;
+        
+        var bladeGameObject = new GameObject("Blade");
+        bladeGameObject.transform.parent = transform;
+        bladeGameObject.AddComponent<MeshFilter>().mesh = mesh;
+        bladeGameObject.AddComponent<MeshRenderer>();
+        bladeGameObject.AddComponent<ObiClothRenderer>();
+        bladeGameObject.AddComponent<ObiCloth>();
+        bladeGameObject.AddComponent<ObiStitcher>();
+        var bladeParticleRenderer = bladeGameObject.AddComponent<ObiParticleRenderer>();
+        bladeParticleRenderer.radiusScale = 0.3f;
+        bladeParticleRenderer.particleColor = Color.red;
+        bladeParticleRenderer.shader = Shader.Find("Obi/Particles");
 
         // create the blueprint: (ObiClothBlueprint, ObiTearableClothBlueprint, ObiSkinnedClothBlueprint)
         var clothBlueprint = ScriptableObject.CreateInstance<ObiClothBlueprint>();
@@ -86,8 +96,9 @@ public class Leaf : MonoBehaviour
 
         // create the cloth actor/renderer:
         // GameObject clothObject = new GameObject("cloth", typeof(ObiCloth),typeof(ObiClothRenderer));
-        ObiCloth cloth = gameObject.GetComponent<ObiCloth>();
-        Renderer clothRenderer = gameObject.GetComponent<Renderer>();
+        ObiCloth cloth = bladeGameObject.GetComponent<ObiCloth>();
+        Renderer clothRenderer = bladeGameObject.GetComponent<Renderer>();
+        
         // set material for the leaf
         clothRenderer.material = new Material(Shader.Find("Unlit/Texture"));
         clothRenderer.material.mainTexture = leafTexture;
@@ -96,9 +107,9 @@ public class Leaf : MonoBehaviour
         cloth.clothBlueprint = ScriptableObject.Instantiate(clothBlueprint);
 
         // parent the cloth under a solver to start simulation:
-        cloth.transform.parent = gameObject.transform;
+        // cloth.transform.parent = bladeGameObject.transform;
 
-        print("> cloth particles" + string.Join(", ", cloth.solverIndices));
+        // print("> cloth particles" + string.Join(", ", cloth.solverIndices));
 
 
         //// create a rope:
@@ -129,7 +140,7 @@ public class Leaf : MonoBehaviour
             // iterate over transforms
             for (int i = 0; i < clothParticleIndices.Length; ++i)
             {
-                print("Add bone at " + clothParticleIndices[i]);
+                // print("Add bone at " + clothParticleIndices[i]);
                 var position = clothBlueprint.positions[clothParticleIndices[i]];
                 // create a gameobject for each transform:
                 axes[i] = new GameObject("Axe_" + i);
@@ -152,16 +163,17 @@ public class Leaf : MonoBehaviour
         ObiParticleRenderer boneParticleRenderer = mainAxe[0].AddComponent<ObiParticleRenderer>();
         boneParticleRenderer.radiusScale = 2.0f;
         boneParticleRenderer.particleColor = Color.green;
+        boneParticleRenderer.shader = Shader.Find("Obi/Particles");
         ObiBoneBlueprint boneBlueprint = bone.boneBlueprint;
         
-        print("> bone particles" + string.Join(", ", boneBlueprint.activeParticleCount));
+        // print("> bone particles" + string.Join(", ", boneBlueprint.activeParticleCount));
         // log bone particle positions
         for (int i = 0; i < boneBlueprint.activeParticleCount; ++i)
         {
-            print("Bone particle " + i + " at " + boneBlueprint.positions[i]);
+            // print("Bone particle " + i + " at " + boneBlueprint.positions[i]);
         }        
         // stitch the cloth to the rope:
-        ObiStitcher stitcher = GetComponent<ObiStitcher>();
+        ObiStitcher stitcher = bladeGameObject.GetComponent<ObiStitcher>();
         stitcher.Actor1 = cloth;
         stitcher.Actor2 = bone;
         // stitch each particle in the first row of the cloth to the closest particle in the rope:
@@ -180,7 +192,7 @@ public class Leaf : MonoBehaviour
                     closestDistance = distance;
                 }
             }
-            print("Stitch " + i + " to " + closestParticle + " at " + closestDistance + " distance");
+            // print("Stitch " + i + " to " + closestParticle + " at " + closestDistance + " distance");
             stitcher.AddStitch(closestParticle, i);
         }
 

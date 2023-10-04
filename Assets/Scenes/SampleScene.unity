@@ -319,11 +319,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1219237124}
   - component: {fileID: 1219237125}
-  - component: {fileID: 1219237130}
-  - component: {fileID: 1219237129}
-  - component: {fileID: 1219237128}
-  - component: {fileID: 1219237127}
-  - component: {fileID: 1219237126}
   m_Layer: 0
   m_Name: Leaf
   m_TagString: Untagged
@@ -362,131 +357,6 @@ MonoBehaviour:
   yResolution: 10
   rodMaterial: {fileID: 0}
   leafTexture: {fileID: 2800000, guid: 6a341baba6ae32557a75b170486aab80, type: 3}
---- !u!114 &1219237126
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1219237123}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cdace116829344344988718be4fb70ab, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  stitches: []
-  actor1: {fileID: 0}
-  actor2: {fileID: 0}
-  particleIndices:
-    serializedContents: 
-    m_AlignBytes: 16
-  stiffnesses:
-    serializedContents: []
-    m_AlignBytes: 16
-  lambdas:
-    serializedContents: []
-    m_AlignBytes: 16
---- !u!114 &1219237127
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1219237123}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1c11d42a3c977407fa40f26f519abb13, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  tangentSpaceUpdate: 4
-  transferParticleColors: 0
---- !u!114 &1219237128
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1219237123}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 206ce0b7d5b3944cdbc83ba88739df98, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  solverIndices: 
-  m_CollisionMaterial: {fileID: 0}
-  m_SurfaceCollisions: 0
-  m_SelfCollisions: 0
-  m_OneSided: 0
-  _distanceConstraintsEnabled: 1
-  _stretchingScale: 1
-  _stretchCompliance: 0
-  _maxCompression: 0
-  _bendConstraintsEnabled: 1
-  _bendCompliance: 0
-  _maxBending: 0.025
-  _plasticYield: 0
-  _plasticCreep: 0
-  _aerodynamicsEnabled: 1
-  _drag: 0.05
-  _lift: 0.05
-  m_ClothBlueprint: {fileID: 0}
-  _volumeConstraintsEnabled: 1
-  _compressionCompliance: 0
-  _pressure: 1
-  _tetherConstraintsEnabled: 1
-  _tetherCompliance: 0
-  _tetherScale: 1
-  m_renderer: {fileID: 0}
---- !u!23 &1219237129
-MeshRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1219237123}
-  m_Enabled: 1
-  m_CastShadows: 1
-  m_ReceiveShadows: 1
-  m_DynamicOccludee: 1
-  m_StaticShadowCaster: 0
-  m_MotionVectors: 1
-  m_LightProbeUsage: 1
-  m_ReflectionProbeUsage: 1
-  m_RayTracingMode: 2
-  m_RayTraceProcedural: 0
-  m_RenderingLayerMask: 1
-  m_RendererPriority: 0
-  m_Materials:
-  - {fileID: 0}
-  m_StaticBatchInfo:
-    firstSubMesh: 0
-    subMeshCount: 0
-  m_StaticBatchRoot: {fileID: 0}
-  m_ProbeAnchor: {fileID: 0}
-  m_LightProbeVolumeOverride: {fileID: 0}
-  m_ScaleInLightmap: 1
-  m_ReceiveGI: 1
-  m_PreserveUVs: 0
-  m_IgnoreNormalsForChartDetection: 0
-  m_ImportantGI: 0
-  m_StitchLightmapSeams: 1
-  m_SelectedEditorRenderState: 3
-  m_MinimumChartSize: 4
-  m_AutoUVMaxDistance: 0.5
-  m_AutoUVMaxAngle: 89
-  m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
-  m_SortingOrder: 0
-  m_AdditionalVertexStreams: {fileID: 0}
---- !u!33 &1219237130
-MeshFilter:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1219237123}
-  m_Mesh: {fileID: 0}
 --- !u!1 &1921839277
 GameObject:
   m_ObjectHideFlags: 0
@@ -547,7 +417,7 @@ MonoBehaviour:
     shockPropagation: 0
     surfaceCollisionIterations: 8
     surfaceCollisionTolerance: 0.005
-  gravity: {x: 0, y: -9.81, z: 0}
+  gravity: {x: 0, y: 0, z: 0}
   gravitySpace: 1
   worldLinearInertiaScale: 0
   worldAngularInertiaScale: 0
@@ -608,7 +478,7 @@ MonoBehaviour:
     enabled: 1
   stitchConstraintParameters:
     evaluationOrder: 1
-    iterations: 1
+    iterations: 12
     SORFactor: 1
     enabled: 1
   densityConstraintParameters:

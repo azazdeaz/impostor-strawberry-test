@@ -29,6 +29,7 @@ public class PlantDescription
     public Blade[] blades;
 }
 
+// [RequireComponent(typeof(MeshRenderer))]
 public class Strawberry : MonoBehaviour
 {
     
@@ -87,6 +88,7 @@ public class Strawberry : MonoBehaviour
         
         var first_blade = new Blade();
         first_blade.triangles = new uint[] { 6, 7, 8, 6, 8, 9, 6, 9, 12, 6, 12, 13, 6, 13, 14 };
+        // first_blade.triangles = new uint[] { 5, 7, 9, 5, 11, 7 };
         plantDescription.blades = new Blade[] { first_blade };
         
         // Build bones
@@ -107,8 +109,9 @@ public class Strawberry : MonoBehaviour
         
         ObiBone obiBone = rootAxe.AddComponent<ObiBone>();
         ObiParticleRenderer boneParticleRenderer = rootAxe.AddComponent<ObiParticleRenderer>();
-        boneParticleRenderer.radiusScale = 2.0f;
+        boneParticleRenderer.radiusScale = 0.3f;
         boneParticleRenderer.particleColor = Color.green;
+        boneParticleRenderer.shader = Shader.Find("Obi/Particles");
         ObiBoneBlueprint boneBlueprint = obiBone.boneBlueprint;
         
         
@@ -116,47 +119,111 @@ public class Strawberry : MonoBehaviour
         foreach (Blade blade in plantDescription.blades)
         {
             var mesh = new Mesh();
-            mesh.vertices = plantDescription.vertices;
-            mesh.triangles = blade.triangles.Select(v => (int)v).ToArray();
+            // remove all the vertices that are not part of the blade and update indices
+            var remapIndices = new List<uint>();
+            foreach (uint index in blade.triangles)
+            {
+                if (!remapIndices.Contains(index))
+                {
+                    remapIndices.Add(index);
+                }
+            }
+            var vertices = remapIndices.Select(index => plantDescription.vertices[index]).ToArray();
+            var triangles = blade.triangles.Select(index => (int)remapIndices.IndexOf(index)).ToArray();
+            
+            
+            mesh.vertices = vertices;
+            mesh.triangles = triangles;
             mesh.RecalculateNormals();
             
+            // Mesh mesh = new Mesh();
+            // var xResolution = 6;
+            // var yResolution = 6;
+            //
+            // Vector3[] vertices = new Vector3[(xResolution + 1) * (yResolution + 1)];
+            // Vector2[] uv = new Vector2[vertices.Length];
+            // int[] triangles = new int[xResolution * yResolution * 6];
+            //
+            // int vert = 0;
+            // int tris = 0;
+            //
+            // for (int y = 0; y <= yResolution; y++)
+            // {
+            //     for (int x = 0; x <= xResolution; x++)
+            //     {
+            //         vertices[vert] = new Vector3(x, y, 0);
+            //         uv[vert] = new Vector2(x / (float)xResolution, y / (float)yResolution);
+            //
+            //         if (x != xResolution && y != yResolution)
+            //         {
+            //             triangles[tris + 0] = vert;
+            //             triangles[tris + 1] = vert + xResolution + 1;
+            //             triangles[tris + 2] = vert + 1;
+            //             triangles[tris + 3] = vert + 1;
+            //             triangles[tris + 4] = vert + xResolution + 1;
+            //             triangles[tris + 5] = vert + xResolution + 2;
+            //
+            //             tris += 6;
+            //         }
+            //
+            //         vert++;
+            //     }
+            // }
+            
+            // // scale the vertices:
+            // for (int i = 0; i < vertices.Length; i++)
+            // {
+            //     vertices[i] *= 1.0f / yResolution;
+            // }
+            
+            // mesh.vertices = vertices;
+            // mesh.triangles = triangles;
+            // mesh.uv = uv;
+            // mesh.RecalculateNormals();
+            
             var bladeGameObject = new GameObject("Blade");
-            var bladeGameObjectMeshFilter = bladeGameObject.AddComponent<MeshFilter>();
-            bladeGameObjectMeshFilter.mesh = mesh;
-            bladeGameObjectMeshFilter.transform.parent = gameObject.transform;
-
+            bladeGameObject.transform.parent = transform;
+            bladeGameObject.AddComponent<MeshFilter>().mesh = mesh;
+            bladeGameObject.AddComponent<MeshRenderer>();
+            bladeGameObject.AddComponent<ObiClothRenderer>();
+            bladeGameObject.AddComponent<ObiCloth>();
+            bladeGameObject.AddComponent<ObiStitcher>();
+            var clothParticleRenderer = bladeGameObject.AddComponent<ObiParticleRenderer>();
+            
+            
+            clothParticleRenderer.radiusScale = 0.3f;
+            clothParticleRenderer.particleColor = Color.red;
+            clothParticleRenderer.shader = Shader.Find("Obi/Particles");
+            
             // create the blueprint: (ObiClothBlueprint, ObiTearableClothBlueprint, ObiSkinnedClothBlueprint)
             var clothBlueprint = ScriptableObject.CreateInstance<ObiClothBlueprint>();
-
+            
             // set the input mesh:
             clothBlueprint.inputMesh = mesh;
-
+            
             // generate the clothBlueprint:
             // StartCoroutine(clothBlueprint.Generate());
             clothBlueprint.GenerateImmediate();
-
-            // create the cloth actor/renderer:
-            // GameObject clothObject = new GameObject("cloth", typeof(ObiCloth),typeof(ObiClothRenderer));
-            ObiCloth obiCloth = bladeGameObject.AddComponent<ObiCloth>();
-            bladeGameObject.AddComponent<ObiClothRenderer>();
-            bladeGameObject.AddComponent<MeshRenderer>();
             
-            Renderer clothRenderer = gameObject.GetComponent<Renderer>();
+            // create the cloth actor/renderer:
+            ObiCloth obiCloth = bladeGameObject.GetComponent<ObiCloth>();
+            Renderer clothRenderer = bladeGameObject.GetComponent<Renderer>();
             // set material for the leaf
             clothRenderer.material = new Material(Shader.Find("Unlit/Texture"));
             clothRenderer.material.mainTexture = leafTexture;
-
-            // instantiate and set the clothBlueprint:
+            
+            // instantiate and set the clothBlueprint:  
             obiCloth.clothBlueprint = ScriptableObject.Instantiate(clothBlueprint);
-
-            // parent the cloth under a solver to start simulation:
-            obiCloth.transform.parent = gameObject.transform;
-
+            
+            // // parent the cloth under a solver to start simulation:
+            // obiCloth.transform.parent = bladeGameObject.transform;
+            
             print("> cloth particles" + string.Join(", ", obiCloth.solverIndices));
+            print(" > cloth blueprint particles" + string.Join(", ", clothBlueprint.positions));
             
             
             // Stitch the blade to the bone
-            ObiStitcher stitcher = bladeGameObject.AddComponent<ObiStitcher>();
+            ObiStitcher stitcher = bladeGameObject.GetComponent<ObiStitcher>();
             stitcher.Actor1 = obiCloth;
             stitcher.Actor2 = obiBone;
             // stitch each particle in the first row of the cloth to the closest particle in the rope:
@@ -177,11 +244,14 @@ public class Strawberry : MonoBehaviour
                 }
                 if (closestDistance > 0.1f)
                 {
+                    print("Skip stitch " + i + " to " + closestParticle + " at " + closestDistance + " distance");
                     continue;
                 }
                 print("Stitch " + i + " to " + closestParticle + " at " + closestDistance + " distance");
                 stitcher.AddStitch(closestParticle, i);
             }
+            
+            stitcher.PushDataToSolver();
         }
     }
 
