@@ -1,10 +1,9 @@
-use std::hash::Hash;
-
 use aery::prelude::*;
 use bevy::ecs::system::RunSystemOnce;
-use bevy::{prelude::*, utils::HashMap};
+use bevy::prelude::*;
 use iter_tools::Itertools;
-use tri_mesh::Mesh;
+
+use crate::MeshMap;
 
 pub struct StrawberryPlant {
     pub world: World,
@@ -75,7 +74,7 @@ impl StrawberryPlant {
         query.iter(&self.world).cloned().collect()
     }
 
-    pub fn generate_mesh(&mut self) -> Mesh {
+    pub fn generate_mesh(&mut self) -> MeshMap {
         self.world.run_system_once(build_mesh)
     }
 }
@@ -105,37 +104,28 @@ fn print_stems(
         });
 }
 
-trait TransformToVec3 {
-    fn to_vertex_pos(&self) -> tri_mesh::math::Vec3;
-}
-
-impl TransformToVec3 for bevy::prelude::Transform {
-    fn to_vertex_pos(&self) -> tri_mesh::math::Vec3 {
-        self.translation.to_array().map(|f| f as f64).into()
-    }
-}
-
 fn build_mesh(
     roots: Query<Entity, With<RootAxe>>,
     stems: Query<((&Stem, &Transform), Relations<AxisUp>)>,
-) -> Mesh {
-    let mut mesh = Mesh::new(&three_d_asset::TriMesh::default());
+) -> MeshMap {
+    let mut mesh = MeshMap::default();
     let ring_resolution = 6;
     let mut rings = Vec::new();
     stems
         .traverse::<AxisUp>(roots.iter())
         .for_each(|(stem, transform), _| {
-            let ring = (0..ring_resolution).map(|i| {
-                let angle = i as f32 / ring_resolution as f32 * std::f32::consts::TAU;
-                let relative_transform = Transform::from_rotation(Quat::from_rotation_y(angle)) * Transform::from_translation(Vec3::X * stem.size)
-                    ;
-                let transform =
-                    **transform * relative_transform;
-                mesh.add_vertex(transform.to_vertex_pos())
-            }).collect_vec();
+            let ring = (0..ring_resolution)
+                .map(|i| {
+                    let angle = i as f32 / ring_resolution as f32 * std::f32::consts::TAU;
+                    let relative_transform = Transform::from_rotation(Quat::from_rotation_y(angle))
+                        * Transform::from_translation(Vec3::X * stem.size);
+                    let transform = **transform * relative_transform;
+                    mesh.add_vertex(transform.translation)
+                })
+                .collect_vec();
             rings.push(ring);
         });
-    
+
     info!("Rings: {:?}", rings);
     for ab in rings.windows(2) {
         let a = &ab[0];
@@ -144,11 +134,11 @@ fn build_mesh(
         for i in 0..ring_resolution {
             let j = (i + 1) % ring_resolution;
             info!("add face: {:?} {:?} {:?}", a[i], a[j], b[i]);
-            mesh.add_face(a[i], a[j], b[i]);
+            mesh.add_face((a[i], a[j], b[i]));
             info!("add face: {:?} {:?} {:?}", a[j], b[j], b[i]);
-            mesh.add_face(b[i], a[j], b[j]);
+            mesh.add_face((b[i], a[j], b[j]));
         }
-    } 
+    }
     info!("Mesh done");
     mesh
 }

@@ -27,18 +27,15 @@ fn draw_nodes(mut gizmos: Gizmos, mut plant: ResMut<PlantToViz>) {
 fn draw_mesh(mut gizmos: Gizmos, mut plant: ResMut<PlantToViz>) {
     let mesh = plant.0.generate_mesh();
     for vertex_id in mesh.vertex_iter() {
-        let vertex = mesh.vertex_position(vertex_id);
-        let vertex = Vec3::new(vertex.x as f32, vertex.y as f32, vertex.z as f32);
+        let vertex: Vec3 = mesh.vertex_position(vertex_id).into();
         gizmos.sphere(vertex.into(), Quat::IDENTITY, 0.02, Color::YELLOW_GREEN);
     }
-    // for face_id in mesh.face_iter() {
-    //     let (a, b, c) = mesh.face_positions(face_id);
-    //     for (a, b) in vec![(a, b), (b, c), (c, a)] {
-    //         let a = Vec3::new(a.x as f32, a.y as f32, a.z as f32);
-    //         let b = Vec3::new(b.x as f32, b.y as f32, b.z as f32);
-    //         gizmos.line(a.into(), b.into(), Color::YELLOW_GREEN);
-    //     }
-    // }
+    for face_id in mesh.face_iter() {
+        let (a, b, c) = mesh.face_positions(face_id);
+        for (a, b) in vec![(a, b), (b, c), (c, a)] {
+            gizmos.line(a.into(), b.into(), Color::YELLOW_GREEN);
+        }
+    }
 }
 
 
