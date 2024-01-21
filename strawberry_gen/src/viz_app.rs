@@ -43,6 +43,7 @@ fn setup(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
+    mut plant: ResMut<PlantToViz>,
 ) {
     commands.spawn(Camera3dBundle {
         transform: Transform::from_xyz(0., 1.5, 12.).looking_at(Vec3::ZERO, Vec3::Y),
@@ -71,6 +72,18 @@ fn setup(
         transform: Transform::from_xyz(4.0, 8.0, 4.0),
         ..default()
     });
+
+    let mesh = plant.0.generate_mesh();
+    let cube_mesh_handle: Handle<Mesh> = meshes.add(mesh.bevy_mesh());
+
+    // Render the mesh with the custom texture using a PbrBundle, add the marker.
+    commands.spawn((
+        PbrBundle {
+            mesh: cube_mesh_handle,
+            material: materials.add(Color::GRAY.into()),
+            ..default()
+        },
+    ));
 
     // example instructions
     // commands.spawn(

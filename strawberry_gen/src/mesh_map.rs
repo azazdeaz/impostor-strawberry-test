@@ -1,5 +1,11 @@
 use std::ops::Deref;
 
+use bevy::{
+    prelude::*,
+    render::{mesh::Indices, render_resource::PrimitiveTopology},
+};
+use iter_tools::Itertools;
+
 #[derive(Debug, Default, Clone)]
 pub struct MeshMap {
     vertices: Vec<[f32; 3]>,
@@ -115,5 +121,18 @@ impl MeshMap {
     }
     pub fn set_uv<T: Into<[f32; 2]>>(&mut self, vertex: VertexId, uv: T) {
         self.uvs[*vertex as usize] = uv.into();
+    }
+
+    pub fn bevy_mesh(&self) -> Mesh {
+        Mesh::new(PrimitiveTopology::TriangleList)
+            .with_inserted_attribute(Mesh::ATTRIBUTE_POSITION, self.vertices.clone())
+            .with_inserted_attribute(Mesh::ATTRIBUTE_UV_0, self.uvs.clone())
+            .with_inserted_attribute(Mesh::ATTRIBUTE_NORMAL, self.normals.clone())
+            .with_indices(Some(Indices::U32(
+                self.faces
+                    .iter()
+                    .flat_map(|[a, b, c]| vec![**a, **b, **c])
+                    .collect_vec(),
+            )))
     }
 }
