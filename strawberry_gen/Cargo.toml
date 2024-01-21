@@ -6,6 +6,21 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-aery = "0.5.1"
-bevy = "0.12.0"
-plexus = "0.0.11"
+aery = "0.5.2"
+bevy = "0.12.1"
+iter_tools = "0.4.0"
+nalgebra = "0.32.3"
+three-d-asset = "0.4.0"
+tri-mesh = "0.6.0"
+
+[dependencies.plexus]
+# git = "https://github.com/olson-sean-k/plexus.git"
+# rev = "501c11e"
+path = "../../plexus/plexus"
+default-features = false
+features = [
+    "geometry-nalgebra"
+]
+
+[patch.crates-io]
+tri-mesh = { path = "../../temp/tri-mesh" }

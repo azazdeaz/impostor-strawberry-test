@@ -13,7 +13,7 @@ pub fn viz_plant(plant: StrawberryPlant) {
         .add_plugins(DefaultPlugins)
         .insert_resource(PlantToViz(plant))
         .add_systems(Startup, setup)
-        .add_systems(Update, (rotate_camera, update_config, draw_nodes))
+        .add_systems(Update, (rotate_camera, update_config, draw_nodes,draw_mesh))
         .run();
 }
 
@@ -23,6 +23,24 @@ fn draw_nodes(mut gizmos: Gizmos, mut plant: ResMut<PlantToViz>) {
         gizmos.sphere(node.translation, Quat::IDENTITY, 0.1, Color::RED);
     }
 }
+
+fn draw_mesh(mut gizmos: Gizmos, mut plant: ResMut<PlantToViz>) {
+    let mesh = plant.0.generate_mesh();
+    for vertex_id in mesh.vertex_iter() {
+        let vertex = mesh.vertex_position(vertex_id);
+        let vertex = Vec3::new(vertex.x as f32, vertex.y as f32, vertex.z as f32);
+        gizmos.sphere(vertex.into(), Quat::IDENTITY, 0.02, Color::YELLOW_GREEN);
+    }
+    // for face_id in mesh.face_iter() {
+    //     let (a, b, c) = mesh.face_positions(face_id);
+    //     for (a, b) in vec![(a, b), (b, c), (c, a)] {
+    //         let a = Vec3::new(a.x as f32, a.y as f32, a.z as f32);
+    //         let b = Vec3::new(b.x as f32, b.y as f32, b.z as f32);
+    //         gizmos.line(a.into(), b.into(), Color::YELLOW_GREEN);
+    //     }
+    // }
+}
+
 
 fn setup(
     mut commands: Commands,
@@ -58,23 +76,23 @@ fn setup(
     });
 
     // example instructions
-    commands.spawn(
-        TextBundle::from_section(
-            "Press 'D' to toggle drawing gizmos on top of everything else in the scene\n\
-            Press 'P' to toggle perspective for line gizmos\n\
-            Hold 'Left' or 'Right' to change the line width",
-            TextStyle {
-                font_size: 20.,
-                ..default()
-            },
-        )
-        .with_style(Style {
-            position_type: PositionType::Absolute,
-            top: Val::Px(12.0),
-            left: Val::Px(12.0),
-            ..default()
-        }),
-    );
+    // commands.spawn(
+    //     TextBundle::from_section(
+    //         "Press 'D' to toggle drawing gizmos on top of everything else in the scene\n\
+    //         Press 'P' to toggle perspective for line gizmos\n\
+    //         Hold 'Left' or 'Right' to change the line width",
+    //         TextStyle {
+    //             font_size: 20.,
+    //             ..default()
+    //         },
+    //     )
+    //     .with_style(Style {
+    //         position_type: PositionType::Absolute,
+    //         top: Val::Px(12.0),
+    //         left: Val::Px(12.0),
+    //         ..default()
+    //     }),
+    // );
 }
 
 // fn system(mut gizmos: Gizmos, time: Res<Time>) {
