@@ -6,7 +6,7 @@ use bevy::{
 };
 use iter_tools::Itertools;
 
-#[derive(Debug, Default, Clone)]
+#[derive(Component, Debug, Default, Clone)]
 pub struct MeshMap {
     vertices: Vec<[f32; 3]>,
     faces: Vec<[VertexId; 3]>,
