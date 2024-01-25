@@ -1,3 +1,6 @@
+mod constraints;
+pub use constraints::*;
+
 mod mesh_map;
 pub use mesh_map::*;
 

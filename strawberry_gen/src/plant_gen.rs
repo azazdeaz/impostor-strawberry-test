@@ -4,7 +4,9 @@ use bevy::ecs::system::{Command, EntityCommand, RunSystemOnce};
 use bevy::prelude::*;
 use iter_tools::Itertools;
 
-use crate::{MeshMap, ParticleBundle, ParticlePosition};
+use crate::{
+    ConstraintToConstraint, EdgeConstraint, MeshMap, ParticleBundle, ParticlePosition, P0, P1,
+};
 
 #[derive(Component, Debug)]
 pub struct StrawberryPlant;
@@ -40,28 +42,39 @@ pub struct AxisUp;
 
 fn init_plant(mut commands: Commands, plants: Query<Entity, Changed<StrawberryPlant>>) {
     for plant in &plants {
-        commands
-            .entity(plant)
-            .insert((
+        let p3 = commands
+            .spawn((
+                Name::new("P3"),
+                Stem::simple().with_length(1.3),
+                ParticleBundle::default(),
+            ))
+            .id();
+        let p2 = commands
+            .spawn((
+                Name::new("P2"),
+                Stem::simple().with_length(1.2),
+                ParticleBundle::default(),
+            ))
+            .set::<AxisUp>(p3)
+            .id();
+        let p1 = commands
+            .spawn((
                 Name::new("P1"),
                 Stem::simple().with_length(1.1),
-                Transform::default(),
+                ParticleBundle::default(),
             ))
-            .scope::<AxisUp>(|scope| {
-                scope
-                    .add((
-                        Name::new("P2"),
-                        Stem::simple().with_length(1.2),
-                        ParticleBundle::default(),
-                    ))
-                    .scope::<AxisUp>(|scope| {
-                        scope.add((
-                            Name::new("P3"),
-                            Stem::simple().with_length(1.3),
-                            ParticleBundle::default(),
-                        ));
-                    });
-            });
+            .set::<AxisUp>(p2)
+            .id();
+        let constrain1 = commands
+            .spawn((Name::new("C1"), EdgeConstraint::from_rest_length(1.1)))
+            .set::<P0>(p1)
+            .set::<P1>(p2)
+            .id();
+        commands
+            .spawn((Name::new("C2"), EdgeConstraint::from_rest_length(1.2)))
+            .set::<P0>(p2)
+            .set::<P1>(p3)
+            .set::<ConstraintToConstraint>(constrain1);
     }
 }
 

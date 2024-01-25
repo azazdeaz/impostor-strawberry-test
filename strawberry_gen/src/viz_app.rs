@@ -1,10 +1,10 @@
 use aery::prelude::*;
-use bevy::{prelude::*, transform::commands};
+use bevy::prelude::*;
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
 use iter_tools::Itertools;
 
 use crate::{
-    AxisUp, MeshMap, ParticlePosition, PlantPhysicsPlugin, Stem, StrawberryPlant,
+    AxisUp, ConstrainsPlugin, MeshMap, ParticlePosition, PlantPhysicsPlugin, Stem, StrawberryPlant,
     StrawberryPlantPlugin,
 };
 use bevy_panorbit_camera::{PanOrbitCamera, PanOrbitCameraPlugin};
@@ -17,9 +17,12 @@ pub fn viz_plant() {
         .add_plugins((DefaultPlugins, Aery))
         .add_plugins(PanOrbitCameraPlugin)
         .add_plugins(WorldInspectorPlugin::new())
-        .add_plugins((PlantPhysicsPlugin, StrawberryPlantPlugin))
+        .add_plugins((PlantPhysicsPlugin, StrawberryPlantPlugin, ConstrainsPlugin))
         .add_systems(Startup, setup)
-        .add_systems(Update, (update_config, draw_nodes, draw_mesh, debug_draw_mesh))
+        .add_systems(
+            Update,
+            (update_config, draw_nodes, draw_mesh, debug_draw_mesh),
+        )
         .run();
 }
 
@@ -59,7 +62,6 @@ fn setup(
         ..default()
     });
 
-    //
     commands.spawn(StrawberryPlant);
     commands.spawn((
         PlantMesh,
@@ -99,7 +101,6 @@ fn draw_mesh(
     changed_particles: Query<Entity, Changed<ParticlePosition>>,
     stems: Query<((&Stem, &Transform), Relations<AxisUp>)>,
     mut meshes: ResMut<Assets<Mesh>>,
-    mut gizmos: Gizmos,
 ) {
     if changed_particles.is_empty() {
         return;
@@ -139,7 +140,7 @@ fn draw_mesh(
     commands.entity(target.0).insert(mesh);
 }
 
-fn debug_draw_mesh(mut mesh_maps: Query<&MeshMap>, mut gizmos: Gizmos) {
+fn debug_draw_mesh(mesh_maps: Query<&MeshMap>, mut gizmos: Gizmos) {
     for mesh in &mesh_maps {
         // Draw the mesh triangles
         for vertex_id in mesh.vertex_iter() {
